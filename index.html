@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Movie Guide - Watch Movies Info</title>
+    <title>CINE SPOT - Movie Guide</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
@@ -13,7 +13,7 @@
         <button id="adminPanelBtn" class="admin-btn">🔧 Admin</button>
     </header>
 
-    <!-- User Login Section (Dummy Accounts - no email needed) -->
+    <!-- User Login Section -->
     <div id="userSection" class="user-section">
         <div id="loggedOutView">
             <h3>👤 Quick Login</h3>
@@ -29,20 +29,21 @@
         </div>
     </div>
 
-    <!-- HOME SECTION (visible by default) -->
+    <!-- HOME SECTION -->
     <div id="homeSection">
-        <!-- Featured Movies Slider -->
-        <div class="slider-container">
+        
+        <!-- FEATURED MOVIES HORIZONTAL SLIDER -->
+        <div class="featured-slider-section">
             <h3>⭐ Featured Movies</h3>
             <div class="slider-wrapper">
-                <button class="slider-btn prev-btn">❮</button>
-                <div class="slider" id="slider"></div>
-                <button class="slider-btn next-btn">❯</button>
+                <button class="slider-btn prev-featured-btn">❮</button>
+                <div class="featured-slider" id="featuredSlider"></div>
+                <button class="slider-btn next-featured-btn">❯</button>
             </div>
-            <div class="slider-dots" id="sliderDots"></div>
+            <div class="slider-dots" id="featuredDots"></div>
         </div>
 
-        <!-- Main Movies Grid -->
+        <!-- All Movies Grid -->
         <div class="movies-section">
             <div class="movies-header">
                 <h2>🎥 All Movies</h2>
