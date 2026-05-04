@@ -4,7 +4,6 @@ let categories = [];
 let currentUser = null;
 let favorites = [];
 let currentCategory = 'all';
-let currentSliderIndex = 0;
 let autoPlayInterval = null;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -50,8 +49,10 @@ async function loadMovies() {
                 }
             }
         }
+        console.log("Movies loaded:", allMovies.length);
+        
         displayMovies();
-        setupSlider();
+        setupFeatured();
         displayFavorites();
     } catch (error) {
         console.error('Error loading movies:', error);
@@ -59,6 +60,72 @@ async function loadMovies() {
         if (grid) grid.innerHTML = '<p style="text-align:center">Error loading movies. Check Google Sheet connection.</p>';
     }
     showLoading(false);
+}
+
+function setupFeatured() {
+    // CHANGE THESE ID NUMBERS to match the movies you want in Featured slider
+    // Look at column A in your Google Sheet to find ID numbers
+    const featuredIds = [2,4,5,9,21,24]; // ← EDIT THESE IDs
+    
+    const featuredMovies = allMovies.filter(m => featuredIds.includes(m.id));
+    const container = document.getElementById('featuredSlider');
+    
+    if (!container) return;
+    
+    if (featuredMovies.length === 0) {
+        container.innerHTML = '<div style="text-align:center; width:100%; padding:40px;">⭐ No featured movies. Edit featuredIds in script.js</div>';
+        return;
+    }
+    
+    container.innerHTML = featuredMovies.map(movie => `
+        <div class="slider-card" onclick="openMovie(${movie.id})">
+            <img src="${movie.posterUrl}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'">
+            <h4>${movie.title}</h4>
+        </div>
+    `).join('');
+    
+    // Setup dots
+    const dotsContainer = document.getElementById('featuredDots');
+    if (dotsContainer && featuredMovies.length > 0) {
+        dotsContainer.innerHTML = '';
+        for (let i = 0; i < featuredMovies.length; i++) {
+            const dot = document.createElement('div');
+            dot.className = 'dot' + (i === 0 ? ' active' : '');
+            dot.onclick = () => {
+                const sliderEl = document.getElementById('featuredSlider');
+                const cardWidth = sliderEl.firstChild?.offsetWidth + 15 || 165;
+                sliderEl.scrollTo({ left: i * cardWidth, behavior: 'smooth' });
+            };
+            dotsContainer.appendChild(dot);
+        }
+    }
+    
+    // Setup prev/next buttons
+    const prevBtn = document.querySelector('.prev-featured-btn');
+    const nextBtn = document.querySelector('.next-featured-btn');
+    const sliderEl = document.getElementById('featuredSlider');
+    
+    if (prevBtn && nextBtn && sliderEl) {
+        prevBtn.onclick = () => sliderEl.scrollBy({ left: -165, behavior: 'smooth' });
+        nextBtn.onclick = () => sliderEl.scrollBy({ left: 165, behavior: 'smooth' });
+    }
+    
+    // Update active dot on scroll
+    if (sliderEl && dotsContainer) {
+        sliderEl.addEventListener('scroll', () => {
+            const cardWidth = sliderEl.firstChild?.offsetWidth + 15 || 165;
+            const scrollPosition = sliderEl.scrollLeft;
+            const activeIndex = Math.round(scrollPosition / cardWidth);
+            const dots = dotsContainer.querySelectorAll('.dot');
+            dots.forEach((dot, idx) => {
+                if (idx === activeIndex) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        });
+    }
 }
 
 function loadCategories() {
@@ -140,48 +207,6 @@ function displayMovies() {
     `).join('');
 }
 
-function setupSlider() {
-    const sliderMovies = allMovies.filter(m => m.inSlider === true);
-    const slider = document.getElementById('slider');
-    if (!slider || sliderMovies.length === 0) {
-        if (slider) slider.innerHTML = '<p style="text-align:center; width:100%">No featured movies. Set inSlider=TRUE in sheet.</p>';
-        return;
-    }
-    
-    slider.innerHTML = sliderMovies.map(movie => `
-        <div class="slider-card" onclick="openMovie(${movie.id})">
-            <img src="${movie.posterUrl}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'">
-            <h4>${movie.title}</h4>
-        </div>
-    `).join('');
-    
-    const dotsContainer = document.getElementById('sliderDots');
-    if (dotsContainer) {
-        dotsContainer.innerHTML = '';
-        for (let i = 0; i < sliderMovies.length; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'dot' + (i === 0 ? ' active' : '');
-            dot.onclick = () => {
-                const cardWidth = 165;
-                slider.scrollTo({ left: i * cardWidth, behavior: 'smooth' });
-            };
-            dotsContainer.appendChild(dot);
-        }
-    }
-    
-    if (autoPlayInterval) clearInterval(autoPlayInterval);
-    autoPlayInterval = setInterval(() => {
-        if (!slider) return;
-        const cardWidth = 165;
-        const maxScroll = slider.scrollWidth - slider.clientWidth;
-        if (slider.scrollLeft + cardWidth >= maxScroll) {
-            slider.scrollTo({ left: 0, behavior: 'smooth' });
-        } else {
-            slider.scrollBy({ left: cardWidth, behavior: 'smooth' });
-        }
-    }, 4000);
-}
-
 function toggleFavorite(event, movieId) {
     event.stopPropagation();
     if (!currentUser) {
@@ -198,6 +223,7 @@ function toggleFavorite(event, movieId) {
     saveFavorites();
     displayMovies();
     displayFavorites();
+    setupFeatured();
     
     const isFav = favorites.includes(movieId);
     const btn = event.currentTarget;
@@ -258,14 +284,6 @@ function setupEventListeners() {
     
     const backBtn = document.getElementById('backBtn');
     if (backBtn) backBtn.onclick = () => window.history.back();
-    
-    const prevBtn = document.querySelector('.prev-btn');
-    const nextBtn = document.querySelector('.next-btn');
-    const slider = document.getElementById('slider');
-    if (prevBtn && nextBtn && slider) {
-        prevBtn.onclick = () => slider.scrollBy({ left: -165, behavior: 'smooth' });
-        nextBtn.onclick = () => slider.scrollBy({ left: 165, behavior: 'smooth' });
-    }
 }
 
 function loginUser() {
@@ -296,6 +314,7 @@ function logoutUser() {
     
     displayMovies();
     displayFavorites();
+    setupFeatured();
 }
 
 function loadUserSession() {
@@ -366,7 +385,7 @@ if (window.location.pathname.includes('movie.html')) {
                                 <button class="quality-btn" data-quality="720p" onclick="downloadQuality('${movie.downloadUrl720 || ''}')">
                                     720p
                                 </button>
-                                <button class="quality-btn" data-quality="1080p" onclick="downloadQuality('${movie.downloadUrl1080p || ''}')">
+                                <button class="quality-btn" data-quality="1080p" onclick="downloadQuality('${movie.downloadUrl1080 || ''}')">
                                     1080p
                                 </button>
                             </div>
@@ -429,6 +448,7 @@ function toggleFavouriteFromDetail(movieId) {
     }
     
     displayFavorites();
+    setupFeatured();
 }
 
 // ===== BOTTOM NAVIGATION FUNCTIONS =====
@@ -533,78 +553,4 @@ function setupFullSearch() {
 function setupCategoryView() {
     const categoryMoviesContainer = document.getElementById('categoryMovies');
     if (!categoryMoviesContainer) return;
-}
-// Movie detail page handler
-if (window.location.pathname.includes('movie.html')) {
-    const movieData = localStorage.getItem('selectedMovie');
-    if (movieData) {
-        const movie = JSON.parse(movieData);
-        const container = document.getElementById('movieDetailContainer');
-        if (container) {
-            const isFav = favorites.includes(movie.id);
-            container.innerHTML = `
-                <div class="movie-detail-card">
-                    <img src="${movie.posterUrl}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'">
-                    <div class="movie-info">
-                        <h2>${movie.title}</h2>
-                        
-                        <div class="movie-buttons">
-                            <a href="${movie.watchUrl || '#'}" target="_blank" class="play-now-btn">
-                                <i class="fas fa-play"></i> Watch Trailer
-                            </a>
-                            <button class="favourite-btn ${isFav ? 'active' : ''}" onclick="toggleFavouriteFromDetail(${movie.id})">
-                                <i class="fas fa-star"></i> Add to Favourite
-                            </button>
-                        </div>
-                        
-                        <div class="download-divider"></div>
-                        
-                        <div class="download-section">
-                            <div class="download-title">
-                                <i class="fas fa-download"></i> DOWNLOAD QUALITY
-                            </div>
-                            <div class="quality-buttons">
-                                <button class="quality-btn" data-quality="480p" onclick="downloadQuality('${movie.downloadUrl480 || ''}')">
-                                    480p
-                                </button>
-                                <button class="quality-btn" data-quality="720p" onclick="downloadQuality('${movie.downloadUrl720 || ''}')">
-                                    720p
-                                </button>
-                                <button class="quality-btn" data-quality="1080p" onclick="downloadQuality('${movie.downloadUrl1080 || ''}')">
-                                    1080p
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="info-grid">
-                            <div class="info-row">
-                                <span class="info-label">RELEASE YEAR</span>
-                                <span class="info-value">${movie.year || 'N/A'}</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">RATING</span>
-                                <span class="info-value rating-value">⭐ ${movie.rating || 'N/A'}/10</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">GENRE</span>
-                                <span class="info-value">${movie.genre || 'N/A'}</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">DURATION</span>
-                                <span class="info-value">${movie.duration || 'N/A'}</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">DIRECTOR</span>
-                                <span class="info-value">${movie.director || 'N/A'}</span>
-                            </div>
-                            <div class="info-row">
-                                <span class="info-label">LANGUAGE</span>
-                                <span class="info-value">${movie.language || 'N/A'}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
-    }
 }
