@@ -65,7 +65,7 @@ async function loadMovies() {
 function setupFeatured() {
     // CHANGE THESE ID NUMBERS to match the movies you want in Featured slider
     // Look at column A in your Google Sheet to find ID numbers
-    const featuredIds = [2,4,5,9,21,24]; // ← EDIT THESE IDs
+    const featuredIds = [2,4,5,9,21,24,32]; // ← EDIT THESE IDs
     
     const featuredMovies = allMovies.filter(m => featuredIds.includes(m.id));
     const container = document.getElementById('featuredSlider');
