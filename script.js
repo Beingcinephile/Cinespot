@@ -54,6 +54,7 @@ async function loadMovies() {
         displayMovies();
         setupFeatured();
         displayFavorites();
+        displayCategories();
     } catch (error) {
         console.error('Error loading movies:', error);
         const grid = document.getElementById('movieGrid');
@@ -63,9 +64,9 @@ async function loadMovies() {
 }
 
 function setupFeatured() {
-    // CHANGE THESE ID NUMBERS to match the movies you want in Featured slider
-    // Look at column A in your Google Sheet to find ID numbers
-    const featuredIds = [2,4,5,9,21,24,32]; // ← EDIT THESE IDs
+    // EDIT THE IDs BELOW - Add movie IDs you want in slider
+    // Find movie IDs from column A in your Google Sheet
+    const featuredIds = [1, 2, 3, 4, 5, 6, 7]; // ← CHANGE THESE NUMBERS
     
     const featuredMovies = allMovies.filter(m => featuredIds.includes(m.id));
     const container = document.getElementById('featuredSlider');
@@ -73,7 +74,7 @@ function setupFeatured() {
     if (!container) return;
     
     if (featuredMovies.length === 0) {
-        container.innerHTML = '<div style="text-align:center; width:100%; padding:40px;">⭐ No featured movies. Edit featuredIds in script.js</div>';
+        container.innerHTML = '<div style="text-align:center; width:100%; padding:40px; background:#1a1a2e; border-radius:20px;">⭐ Edit featuredIds in script.js to add movies to slider</div>';
         return;
     }
     
@@ -136,7 +137,6 @@ function loadCategories() {
         categories = ['Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Romance', 'Thriller'];
         saveCategories();
     }
-    displayCategories();
 }
 
 function saveCategories() {
@@ -147,14 +147,32 @@ function displayCategories() {
     const container = document.getElementById('categoriesList');
     if (!container) return;
     
-    let html = '';
-    categories.forEach(cat => {
+    // Collect all unique categories from movies (supports comma-separated values)
+    let uniqueCategories = [];
+    
+    allMovies.forEach(movie => {
+        if (movie.genre && movie.genre !== 'Uncategorized') {
+            const genres = movie.genre.split(',').map(g => g.trim());
+            genres.forEach(genre => {
+                if (genre && !uniqueCategories.includes(genre)) {
+                    uniqueCategories.push(genre);
+                }
+            });
+        }
+    });
+    
+    uniqueCategories.sort();
+    
+    let html = '<button class="category-btn active" data-category="all">All Movies</button>';
+    uniqueCategories.forEach(cat => {
         html += `<button class="category-btn" data-category="${cat}">${cat}</button>`;
     });
     container.innerHTML = html;
     
     document.querySelectorAll('#categoriesList .category-btn').forEach(btn => {
         btn.addEventListener('click', () => {
+            document.querySelectorAll('#categoriesList .category-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
             const category = btn.dataset.category;
             showMoviesByCategory(category);
         });
@@ -165,7 +183,16 @@ function showMoviesByCategory(category) {
     const container = document.getElementById('categoryMovies');
     if (!container) return;
     
-    const filtered = allMovies.filter(m => m.genre === category);
+    let filtered;
+    if (category === 'all') {
+        filtered = [...allMovies].reverse();
+    } else {
+        filtered = allMovies.filter(movie => {
+            if (!movie.genre || movie.genre === 'Uncategorized') return false;
+            const genres = movie.genre.split(',').map(g => g.trim());
+            return genres.includes(category);
+        }).reverse();
+    }
     
     if (filtered.length === 0) {
         container.innerHTML = '<p style="text-align:center; grid-column:1/-1">No movies in this category</p>';
@@ -188,7 +215,8 @@ function displayMovies() {
     const grid = document.getElementById('movieGrid');
     if (!grid) return;
     
-    let filtered = allMovies;
+    // Sort movies by ID in REVERSE order (newest first)
+    let filtered = [...allMovies].reverse();
     
     if (filtered.length === 0) {
         grid.innerHTML = '<p style="text-align:center; grid-column:1/-1">No movies found. Add some to your Google Sheet!</p>';
