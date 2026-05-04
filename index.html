@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Movie Guide - Watch Movies Info</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>🎬 CINE SPOT</h1>
+        <button id="adminPanelBtn" class="admin-btn">🔧 Admin</button>
+    </header>
+
+    <!-- User Login Section (Dummy Accounts - no email needed) -->
+    <div id="userSection" class="user-section">
+        <div id="loggedOutView">
+            <h3>👤 Quick Login</h3>
+            <div class="login-form">
+                <input type="text" id="dummyUsername" placeholder="Username (anything works)" autocomplete="off">
+                <input type="password" id="dummyPassword" placeholder="Password (anything works)">
+                <button id="loginBtn">Login / Sign Up</button>
+            </div>
+            <small>✨ No email needed - just type any username and password!</small>
+        </div>
+        <div id="loggedInView" style="display:none">
+            <p>Welcome, <span id="currentUser"></span>! <button id="logoutBtn" class="logout-btn">Logout</button></p>
+        </div>
+    </div>
+
+    <!-- HOME SECTION (visible by default) -->
+    <div id="homeSection">
+        <!-- Featured Movies Slider -->
+        <div class="slider-container">
+            <h3>⭐ Featured Movies</h3>
+            <div class="slider-wrapper">
+                <button class="slider-btn prev-btn">❮</button>
+                <div class="slider" id="slider"></div>
+                <button class="slider-btn next-btn">❯</button>
+            </div>
+            <div class="slider-dots" id="sliderDots"></div>
+        </div>
+
+        <!-- Main Movies Grid -->
+        <div class="movies-section">
+            <div class="movies-header">
+                <h2>🎥 All Movies</h2>
+            </div>
+            <div id="movieGrid" class="movie-grid"></div>
+            <div id="loadingIndicator" class="loading">📽️ Loading movies...</div>
+        </div>
+    </div>
+
+    <!-- SEARCH SECTION (hidden by default) -->
+    <div id="searchSection" style="display:none">
+        <div class="search-section">
+            <div class="search-box-full">
+                <input type="text" id="searchInputFull" placeholder="🔍 Search by title, genre, director, year...">
+            </div>
+            <div id="searchResults" class="movie-grid"></div>
+        </div>
+    </div>
+
+    <!-- CATEGORIES SECTION (hidden by default) -->
+    <div id="categoriesSection" style="display:none">
+        <div class="category-section">
+            <div class="category-header">
+                <h3>🎭 Select Category</h3>
+            </div>
+            <div id="categoriesList" class="categories-list"></div>
+            <div id="categoryMovies" class="movie-grid" style="margin-top: 20px;">
+                <p style="text-align:center; grid-column:1/-1">Select a category to see movies</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MY ACCOUNT SECTION (hidden by default) -->
+    <div id="accountSection" style="display:none">
+        <div class="favorites-section">
+            <h3>⭐ My Favorites</h3>
+            <div id="favoritesGrid" class="favorites-grid"></div>
+        </div>
+    </div>
+
+    <!-- BOTTOM NAVIGATION BAR -->
+    <div class="bottom-nav">
+        <div class="nav-item active" data-page="home">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-label">Home</span>
+        </div>
+        <div class="nav-item" data-page="search">
+            <span class="nav-icon">🔍</span>
+            <span class="nav-label">Search</span>
+        </div>
+        <div class="nav-item" data-page="categories">
+            <span class="nav-icon">🎭</span>
+            <span class="nav-label">Categories</span>
+        </div>
+        <div class="nav-item" data-page="account">
+            <span class="nav-icon">⭐</span>
+            <span class="nav-label">My Account</span>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

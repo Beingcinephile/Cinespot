@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Movie Guide</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .admin-panel { max-width: 800px; margin: 0 auto; padding: 20px; }
+        .admin-section { background: #1e1e1e; padding: 20px; margin: 20px 0; border-radius: 10px; }
+        .admin-section h3 { color: #e50914; margin-bottom: 15px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #ccc; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; background: #333; border: 1px solid #555; color: white; border-radius: 5px; }
+        button { background: #e50914; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { opacity: 0.8; }
+        .movie-list { max-height: 400px; overflow-y: auto; }
+        .movie-item { background: #2a2a2a; padding: 10px; margin: 10px 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .movie-item button { margin-left: 10px; padding: 5px 10px; font-size: 12px; }
+        .success { background: #4caf50; padding: 10px; margin: 10px 0; border-radius: 5px; display: none; }
+        .error { background: #f44336; padding: 10px; margin: 10px 0; border-radius: 5px; display: none; }
+        .slider-items { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; max-height: 300px; overflow-y: auto; }
+        .slider-checkbox { background: #333; padding: 10px; border-radius: 5px; display: flex; align-items: center; gap: 10px; width: calc(50% - 10px); }
+        .slider-checkbox img { width: 40px; height: 60px; object-fit: cover; border-radius: 5px; }
+        .category-item { background: #2a2a2a; padding: 10px; margin: 5px 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
+        .password-section { background: #ff9800; color: #000; }
+        .password-section input { background: white; color: black; }
+        .password-section h3 { color: #000; }
+        .btn-small { background: #555; padding: 5px 10px; font-size: 12px; }
+        .btn-danger { background: #f44336; }
+        .btn-success { background: #4caf50; }
+    </style>
+</head>
+<body>
+    <div class="admin-panel">
+        <h1>🔧 Admin Control Panel</h1>
+        <a href="index.html" style="color: white; text-decoration: none;">← Back to Home</a>
+
+        <!-- Login Section -->
+        <div id="loginSection" class="admin-section password-section">
+            <h3>🔐 Admin Login</h3>
+            <div class="form-group">
+                <input type="password" id="adminPassword" placeholder="Enter Admin Password">
+            </div>
+            <button onclick="checkAdminLogin()">Login</button>
+            <button onclick="forgotPassword()" style="background: #666;">Forgot Password?</button>
+            <div id="loginError" class="error" style="display:none">Wrong password!</div>
+        </div>
+
+        <div id="adminContent" style="display:none">
+            <!-- Change Password -->
+            <div class="admin-section">
+                <h3>🔑 Change Admin Password</h3>
+                <div class="form-group">
+                    <input type="password" id="newPassword" placeholder="New Password">
+                </div>
+                <button onclick="changePassword()">Update Password</button>
+                <div id="passwordMsg" class="success" style="display:none">Password updated!</div>
+            </div>
+
+            <!-- Categories Management -->
+            <div class="admin-section">
+                <h3>🏷️ Manage Categories</h3>
+                <div class="form-group">
+                    <input type="text" id="newCategory" placeholder="New category name">
+                </div>
+                <button onclick="addCategory()">Add Category</button>
+                <div id="categoriesListAdmin" class="category-list" style="margin-top: 15px;"></div>
+            </div>
+
+            <!-- Add/Edit Movie -->
+            <div class="admin-section">
+                <h3>🎬 Add New Movie</h3>
+                <div class="form-group">
+                    <input type="text" id="movieTitle" placeholder="Movie Title">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="moviePoster" placeholder="Poster Image URL">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="movieYear" placeholder="Year (e.g., 2024)">
+                </div>
+                <div class="form-group">
+                    <input type="number" id="movieRating" placeholder="Rating (1-10)" step="0.1">
+                </div>
+                <div class="form-group">
+                    <select id="movieGenre">
+                        <option value="">Select Genre</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="text" id="movieDuration" placeholder="Duration (e.g., 2h 15min)">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="movieDirector" placeholder="Director">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="movieLanguage" placeholder="Language (e.g., English, Hindi)">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="movieWatchUrl" placeholder="Watch URL (Netflix/Amazon link)">
+                </div>
+                <div class="form-group">
+                    <input type="text" id="movieDownloadUrl" placeholder="Download Poster URL (different from poster)">
+                </div>
+                <button onclick="addMovie()">Add Movie</button>
+                <div id="editMode" style="display:none">
+                    <input type="hidden" id="editId">
+                    <button onclick="updateMovie()">Update Movie</button>
+                    <button onclick="cancelEdit()">Cancel</button>
+                </div>
+                <div id="movieMsg" class="success" style="display:none"></div>
+            </div>
+
+            <!-- Slider Management -->
+            <div class="admin-section">
+                <h3>⭐ Manage Slider (Select 5-7 movies)</h3>
+                <div id="sliderMoviesList" class="slider-items"></div>
+                <button onclick="saveSlider()">Save Slider Selection</button>
+                <div id="sliderMsg" class="success" style="display:none">Slider updated!</div>
+            </div>
+
+            <!-- All Movies List -->
+            <div class="admin-section">
+                <h3>📋 All Movies (Click Edit to modify)</h3>
+                <div id="moviesListAdmin" class="movie-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="admin-script.js"></script>
+</body>
+</html>
