@@ -36,7 +36,7 @@ async function loadMovies() {
                         year: row[2]?.v || 'N/A',
                         rating: row[3]?.v || '0',
                         posterUrl: row[4]?.v || '',
-                        watchUrl: row[5]?.v || '#',
+                        trailerUrl: row[5]?.v || '',
                         genre: row[6]?.v || 'Uncategorized',
                         duration: row[7]?.v || 'N/A',
                         director: row[8]?.v || 'Unknown',
@@ -65,8 +65,7 @@ async function loadMovies() {
 
 function setupFeatured() {
     // EDIT THE IDs BELOW - Add movie IDs you want in slider
-    // Find movie IDs from column A in your Google Sheet
-    const featuredIds = [40,38,24,34,32]; // ← CHANGE THESE NUMBERS
+    const featuredIds = [1, 2, 3, 4, 5, 6, 7];
     
     const featuredMovies = allMovies.filter(m => featuredIds.includes(m.id));
     const container = document.getElementById('featuredSlider');
@@ -85,7 +84,6 @@ function setupFeatured() {
         </div>
     `).join('');
     
-    // Setup dots
     const dotsContainer = document.getElementById('featuredDots');
     if (dotsContainer && featuredMovies.length > 0) {
         dotsContainer.innerHTML = '';
@@ -101,7 +99,6 @@ function setupFeatured() {
         }
     }
     
-    // Setup prev/next buttons
     const prevBtn = document.querySelector('.prev-featured-btn');
     const nextBtn = document.querySelector('.next-featured-btn');
     const sliderEl = document.getElementById('featuredSlider');
@@ -111,7 +108,6 @@ function setupFeatured() {
         nextBtn.onclick = () => sliderEl.scrollBy({ left: 165, behavior: 'smooth' });
     }
     
-    // Update active dot on scroll
     if (sliderEl && dotsContainer) {
         sliderEl.addEventListener('scroll', () => {
             const cardWidth = sliderEl.firstChild?.offsetWidth + 15 || 165;
@@ -147,7 +143,6 @@ function displayCategories() {
     const container = document.getElementById('categoriesList');
     if (!container) return;
     
-    // Collect all unique categories from movies (supports comma-separated values)
     let uniqueCategories = [];
     
     allMovies.forEach(movie => {
@@ -215,7 +210,6 @@ function displayMovies() {
     const grid = document.getElementById('movieGrid');
     if (!grid) return;
     
-    // Sort movies by ID in REVERSE order (newest first)
     let filtered = [...allMovies].reverse();
     
     if (filtered.length === 0) {
@@ -364,12 +358,26 @@ function openMovie(movieId) {
     }
 }
 
-function downloadQuality(url) {
+function openTrailer(url) {
     if (!url || url === '') {
-        alert('Download link not available for this quality');
+        alert('Trailer not available');
         return;
     }
     window.open(url, '_blank');
+}
+
+function downloadQuality(url) {
+    if (!url || url === '') {
+        alert('Download link not available');
+        return;
+    }
+    window.open(url, '_blank');
+}
+
+function openTelegram() {
+    // CHANGE THIS LINK TO YOUR TELEGRAM CHANNEL LINK
+    const telegramLink = 'https://t.me/YOUR_TELEGRAM_USERNAME';
+    window.open(telegramLink, '_blank');
 }
 
 function showLoading(show) {
@@ -385,18 +393,25 @@ if (window.location.pathname.includes('movie.html')) {
         const container = document.getElementById('movieDetailContainer');
         if (container) {
             const isFav = favorites.includes(movie.id);
+            
             container.innerHTML = `
                 <div class="movie-detail-card">
                     <img src="${movie.posterUrl}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'">
                     <div class="movie-info">
-                        <h2>${movie.title}</h2>
+                        <h2>${movie.title} (${movie.year})</h2>
                         
                         <div class="movie-buttons">
-                            <a href="${movie.watchUrl || '#'}" target="_blank" class="play-now-btn">
+                            <button class="trailer-btn" onclick="openTrailer('${movie.trailerUrl || ''}')">
                                 <i class="fas fa-play"></i> Watch Trailer
-                            </a>
+                            </button>
                             <button class="favourite-btn ${isFav ? 'active' : ''}" onclick="toggleFavouriteFromDetail(${movie.id})">
                                 <i class="fas fa-star"></i> Add to Favourite
+                            </button>
+                        </div>
+                        
+                        <div class="telegram-btn-container">
+                            <button class="telegram-join-btn" onclick="openTelegram()">
+                                <i class="fab fa-telegram-plane"></i> Join Telegram
                             </button>
                         </div>
                         
@@ -404,18 +419,12 @@ if (window.location.pathname.includes('movie.html')) {
                         
                         <div class="download-section">
                             <div class="download-title">
-                                <i class="fas fa-download"></i> DOWNLOAD QUALITY
+                                <i class="fas fa-download"></i> DOWNLOAD
                             </div>
                             <div class="quality-buttons">
-                                <button class="quality-btn" data-quality="480p" onclick="downloadQuality('${movie.downloadUrl480 || ''}')">
-                                    480p
-                                </button>
-                                <button class="quality-btn" data-quality="720p" onclick="downloadQuality('${movie.downloadUrl720 || ''}')">
-                                    720p
-                                </button>
-                                <button class="quality-btn" data-quality="1080p" onclick="downloadQuality('${movie.downloadUrl1080 || ''}')">
-                                    1080p
-                                </button>
+                                <button class="quality-btn" onclick="downloadQuality('${movie.downloadUrl480 || ''}')">480p</button>
+                                <button class="quality-btn" onclick="downloadQuality('${movie.downloadUrl720 || ''}')">720p</button>
+                                <button class="quality-btn" onclick="downloadQuality('${movie.downloadUrl1080 || ''}')">1080p</button>
                             </div>
                         </div>
                         
@@ -581,4 +590,4 @@ function setupFullSearch() {
 function setupCategoryView() {
     const categoryMoviesContainer = document.getElementById('categoryMovies');
     if (!categoryMoviesContainer) return;
-}
+            }
