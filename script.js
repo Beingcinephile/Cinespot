@@ -393,7 +393,7 @@ if (window.location.pathname.includes('movie.html')) {
                         
                         <div class="movie-buttons">
                             <a href="${movie.watchUrl || '#'}" target="_blank" class="play-now-btn">
-                                <i class="fas fa-play"></i> Watch Now
+                                <i class="fas fa-play"></i> Watch Trailer
                             </a>
                             <button class="favourite-btn ${isFav ? 'active' : ''}" onclick="toggleFavouriteFromDetail(${movie.id})">
                                 <i class="fas fa-star"></i> Add to Favourite
