@@ -590,4 +590,4 @@ function setupFullSearch() {
 function setupCategoryView() {
     const categoryMoviesContainer = document.getElementById('categoryMovies');
     if (!categoryMoviesContainer) return;
-            }
+                    }
