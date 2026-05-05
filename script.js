@@ -376,7 +376,7 @@ function downloadQuality(url) {
 
 function openTelegram() {
     // CHANGE THIS LINK TO YOUR TELEGRAM CHANNEL LINK
-    const telegramLink = 'https://t.me/YOUR_TELEGRAM_USERNAME';
+    const telegramLink = 'https://t.me/yourCineSpot';
     window.open(telegramLink, '_blank');
 }
 
