@@ -578,3 +578,34 @@ small {
 .movie-card, .slider-card, .fav-card {
     animation: fadeInUp 0.5s ease;
    }
+/* ===== TELEGRAM JOIN BUTTON ===== */
+.telegram-btn-container {
+    margin: 15px 0;
+}
+
+.telegram-join-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #0088cc;
+    color: white;
+    text-align: center;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 14px;
+    font-weight: 800;
+    font-size: 16px;
+    transition: all 0.3s;
+    width: 100%;
+    cursor: pointer;
+}
+
+.telegram-join-btn i {
+    font-size: 18px;
+}
+
+.telegram-join-btn:hover {
+    background: #006699;
+    transform: scale(1.02);
+}
