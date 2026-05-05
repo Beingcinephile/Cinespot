@@ -577,7 +577,85 @@ small {
 
 .movie-card, .slider-card, .fav-card {
     animation: fadeInUp 0.5s ease;
-   }
+}
+/* ===== TRAILER BUTTON ===== */
+.trailer-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #ffffff;
+    color: #000000;
+    text-align: center;
+    padding: 14px 20px;
+    text-decoration: none;
+    border-radius: 14px;
+    font-weight: 800;
+    font-size: 16px;
+    transition: all 0.3s;
+    width: 100%;
+    cursor: pointer;
+    border: none;
+}
+
+.trailer-btn i {
+    font-size: 16px;
+}
+
+.trailer-btn:hover {
+    transform: scale(1.02);
+    background: #f0f0f0;
+}
+
+/* ===== EPISODE MATRIX STYLES ===== */
+.episodes-matrix-container {
+    margin: 20px 0;
+}
+
+.quality-matrix {
+    margin-bottom: 25px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    padding: 15px;
+}
+
+.quality-matrix-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #ffd700;
+    margin-bottom: 15px;
+    letter-spacing: 0.5px;
+}
+
+.episodes-matrix-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+}
+
+.matrix-episode-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 10px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
+}
+
+.matrix-episode-btn:hover {
+    background: #e50914;
+    transform: scale(1.02);
+}
+
+@media (min-width: 768px) {
+    .episodes-matrix-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
 /* ===== TELEGRAM JOIN BUTTON ===== */
 .telegram-btn-container {
     margin: 15px 0;
@@ -609,3 +687,24 @@ small {
     background: #006699;
     transform: scale(1.02);
 }
+/* ===== FOOTER STYLES ===== */
+.footer {
+    text-align: center;
+    padding: 20px 16px;
+    margin-top: 10px;
+    margin-bottom: 60px;
+}
+
+.footer p {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 1px;
+    word-spacing: 2px;
+}
+
+@media (min-width: 768px) {
+    .footer p {
+        font-size: 14px;
+    }
+   }
