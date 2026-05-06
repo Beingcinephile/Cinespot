@@ -65,7 +65,7 @@ async function loadMovies() {
 
 function setupFeatured() {
     // EDIT THE IDs BELOW - Add movie IDs you want in slider
-    const featuredIds = [1, 2, 3, 4, 5, 6, 7];
+    const featuredIds = [55, 52, 51, 48, 43, 34, 24];
     
     const featuredMovies = allMovies.filter(m => featuredIds.includes(m.id));
     const container = document.getElementById('featuredSlider');
