@@ -44,7 +44,8 @@ async function loadMovies() {
                         inSlider: row[10]?.v === 'TRUE',
                         downloadUrl480: row[11]?.v || '',
                         downloadUrl720: row[12]?.v || '',
-                        downloadUrl1080: row[13]?.v || ''
+                        downloadUrl1080: row[13]?.v || '',
+                        sourceType: row[14]?.v || ''
                     });
                 }
             }
@@ -62,10 +63,31 @@ async function loadMovies() {
     }
     showLoading(false);
 }
+function getSourceTypeBadge(sourceType) {
+    if (!sourceType || sourceType === '') return '';
+    
+    let badgeClass = '';
+    let displayText = '';
+    
+    if (sourceType === 'WEB-DL') {
+        badgeClass = 'badge-webdl';
+        displayText = 'WEB-DL';
+    } else if (sourceType === 'HDTC') {
+        badgeClass = 'badge-hdtc';
+        displayText = 'HDTC';
+    } else if (sourceType === 'UPCOMING') {
+        badgeClass = 'badge-upcoming';
+        displayText = 'UPCOMING';
+    } else {
+        return '';
+    }
+    
+    return `<div class="source-badge ${badgeClass}">${displayText}</div>`;
+}
 
 function setupFeatured() {
     // EDIT THE IDs BELOW - Add movie IDs you want in slider
-    const featuredIds = [55, 52, 51, 48, 43, 34, 24];
+    const featuredIds = [1, 2, 3, 4, 5, 6, 7];
     
     const featuredMovies = allMovies.filter(m => featuredIds.includes(m.id));
     const container = document.getElementById('featuredSlider');
@@ -80,6 +102,7 @@ function setupFeatured() {
     container.innerHTML = featuredMovies.map(movie => `
         <div class="slider-card" onclick="openMovie(${movie.id})">
             <img src="${movie.posterUrl}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'">
+            ${getSourceTypeBadge(movie.sourceType)}
             <h4>${movie.title}</h4>
         </div>
     `).join('');
@@ -197,6 +220,7 @@ function showMoviesByCategory(category) {
     container.innerHTML = filtered.map(movie => `
         <div class="movie-card" onclick="openMovie(${movie.id})">
             <img src="${movie.posterUrl}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'">
+            ${getSourceTypeBadge(movie.sourceType)}
             <h4>${movie.title} (${movie.year})</h4>
             <div class="movie-card-fav ${isFavorite(movie.id) ? 'active' : ''}" onclick="toggleFavorite(event, ${movie.id})">
                 <i class="fas fa-star"></i>
@@ -220,6 +244,7 @@ function displayMovies() {
     grid.innerHTML = filtered.map(movie => `
         <div class="movie-card" onclick="openMovie(${movie.id})">
             <img src="${movie.posterUrl}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'">
+            ${getSourceTypeBadge(movie.sourceType)}
             <h4>${movie.title} (${movie.year})</h4>
             <div class="movie-card-fav ${isFavorite(movie.id) ? 'active' : ''}" onclick="toggleFavorite(event, ${movie.id})">
                 <i class="fas fa-star"></i>
@@ -305,7 +330,7 @@ function setupEventListeners() {
     if (adminBtn) adminBtn.onclick = () => window.location.href = 'admin.html';
     
     const backBtn = document.getElementById('backBtn');
-    if (backBtn) backBtn.onclick = () => window.history.back();
+    if (backBtn) backBtn.onclick = () => window.location.href = 'index.html';
 }
 
 function loginUser() {
@@ -384,7 +409,6 @@ function showLoading(show) {
     const loader = document.getElementById('loadingIndicator');
     if (loader) loader.style.display = show ? 'block' : 'none';
 }
-
 // Movie detail page handler
 if (window.location.pathname.includes('movie.html')) {
     const movieData = localStorage.getItem('selectedMovie');
@@ -426,6 +450,13 @@ if (window.location.pathname.includes('movie.html')) {
                                 <button class="quality-btn" onclick="downloadQuality('${movie.downloadUrl720 || ''}')">720p</button>
                                 <button class="quality-btn" onclick="downloadQuality('${movie.downloadUrl1080 || ''}')">1080p</button>
                             </div>
+                        </div>
+                        
+                        <!-- NOTE SECTION - EDIT YOUR TEXT HERE -->
+                        <div class="note-section">
+                            <div class="note-title">📌 NOTE:</div>
+                            <div class="note-content">
+                                Please Install Opera , JioSpehere , Brave Browser From Playstore and turn on ADS-BLOCKER Inside the app for smooth download process. The Download links were daily updated.                          </div>
                         </div>
                         
                         <div class="info-grid">
@@ -577,6 +608,7 @@ function setupFullSearch() {
         resultsContainer.innerHTML = filtered.map(movie => `
             <div class="movie-card" onclick="openMovie(${movie.id})">
                 <img src="${movie.posterUrl}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'">
+                ${getSourceTypeBadge(movie.sourceType)}
                 <h4>${movie.title} (${movie.year})</h4>
                 <div class="movie-card-fav ${isFavorite(movie.id) ? 'active' : ''}" onclick="toggleFavorite(event, ${movie.id})">
                     <i class="fas fa-star"></i>
@@ -590,4 +622,4 @@ function setupFullSearch() {
 function setupCategoryView() {
     const categoryMoviesContainer = document.getElementById('categoryMovies');
     if (!categoryMoviesContainer) return;
-                    }
+}
