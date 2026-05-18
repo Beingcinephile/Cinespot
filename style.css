@@ -797,3 +797,30 @@ small {
     backdrop-filter: blur(4px);
     pointer-events: none;
 }
+/* ===== PREMIUM NOTE SECTION ===== */
+.note-section {
+    background: linear-gradient(135deg, #e50914, #b00710);
+    border-radius: 16px;
+    padding: 16px 18px;
+    margin: 20px 0;
+    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.3);
+}
+
+.note-title {
+    font-size: 14px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.9);
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.note-content {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.5;
+    word-break: break-word;
+}
