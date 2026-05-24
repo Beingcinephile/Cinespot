@@ -9,7 +9,7 @@
 const GOOGLE_SHEET_ID = '1Jv3rzqQP0RI2gZBSNoxRHtqYQHnZ12Ia9dO3y-N6lB4';
 
 // Admin password - you can change this later from admin panel
-let ADMIN_PASSWORD = 'beingrayan01';
+let ADMIN_PASSWORD = 'beingruksar01';
 
 // Backup security (in case you forget admin password)
 const BACKUP_QUESTION = 'What is your favorite movie?';
