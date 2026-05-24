@@ -5,6 +5,7 @@ let currentUser = null;
 let favorites = [];
 let currentCategory = 'all';
 let autoPlayInterval = null;
+let timerInterval = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     loadMovies();
@@ -45,7 +46,10 @@ async function loadMovies() {
                         downloadUrl480: row[11]?.v || '',
                         downloadUrl720: row[12]?.v || '',
                         downloadUrl1080: row[13]?.v || '',
-                        sourceType: row[14]?.v || ''
+                        sourceType: row[14]?.v || '',
+                        releaseDate: row[15]?.v || '',
+                        uploadProgress: row[16]?.v || 0,
+                        status: row[17]?.v || ''
                     });
                 }
             }
@@ -63,30 +67,8 @@ async function loadMovies() {
     }
     showLoading(false);
 }
-function getSourceTypeBadge(sourceType) {
-    if (!sourceType || sourceType === '') return '';
-    
-    let badgeClass = '';
-    let displayText = '';
-    
-    if (sourceType === 'WEB-DL') {
-        badgeClass = 'badge-webdl';
-        displayText = 'WEB-DL';
-    } else if (sourceType === 'HDTC') {
-        badgeClass = 'badge-hdtc';
-        displayText = 'HDTC';
-    } else if (sourceType === 'UPCOMING') {
-        badgeClass = 'badge-upcoming';
-        displayText = 'UPCOMING';
-    } else {
-        return '';
-    }
-    
-    return `<div class="source-badge ${badgeClass}">${displayText}</div>`;
-}
 
 function setupFeatured() {
-    // EDIT THE IDs BELOW - Add movie IDs you want in slider
     const featuredIds = [1, 2, 3, 4, 5, 6, 7];
     
     const featuredMovies = allMovies.filter(m => featuredIds.includes(m.id));
@@ -95,17 +77,28 @@ function setupFeatured() {
     if (!container) return;
     
     if (featuredMovies.length === 0) {
-        container.innerHTML = '<div style="text-align:center; width:100%; padding:40px; background:#1a1a2e; border-radius:20px;">⭐ Edit featuredIds in script.js to add movies to slider</div>';
+        container.innerHTML = '<div style="text-align:center; width:100%; padding:40px;">⭐ Edit featuredIds in script.js to add movies to slider</div>';
         return;
     }
     
-    container.innerHTML = featuredMovies.map(movie => `
-        <div class="slider-card" onclick="openMovie(${movie.id})">
-            <img src="${movie.posterUrl}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'">
-            ${getSourceTypeBadge(movie.sourceType)}
-            <h4>${movie.title}</h4>
-        </div>
-    `).join('');
+    container.innerHTML = featuredMovies.map(movie => {
+        let badgeHtml = '';
+        if (movie.sourceType === 'WEB-DL') {
+            badgeHtml = '<div class="source-badge badge-webdl">WEB-DL</div>';
+        } else if (movie.sourceType === 'HDTC') {
+            badgeHtml = '<div class="source-badge badge-hdtc">HDTC</div>';
+        } else if (movie.sourceType === 'UPCOMING') {
+            badgeHtml = '<div class="source-badge badge-upcoming">UPCOMING</div>';
+        }
+        
+        return `
+            <div class="slider-card" onclick="openMovie(${movie.id})">
+                ${badgeHtml}
+                <img src="${movie.posterUrl}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'">
+                <h4>${movie.title}</h4>
+            </div>
+        `;
+    }).join('');
     
     const dotsContainer = document.getElementById('featuredDots');
     if (dotsContainer && featuredMovies.length > 0) {
@@ -217,17 +210,28 @@ function showMoviesByCategory(category) {
         return;
     }
     
-    container.innerHTML = filtered.map(movie => `
-        <div class="movie-card" onclick="openMovie(${movie.id})">
-            <img src="${movie.posterUrl}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'">
-            ${getSourceTypeBadge(movie.sourceType)}
-            <h4>${movie.title} (${movie.year})</h4>
-            <div class="movie-card-fav ${isFavorite(movie.id) ? 'active' : ''}" onclick="toggleFavorite(event, ${movie.id})">
-                <i class="fas fa-star"></i>
-                <span>Add to Favourite</span>
+    container.innerHTML = filtered.map(movie => {
+        let badgeHtml = '';
+        if (movie.sourceType === 'WEB-DL') {
+            badgeHtml = '<div class="source-badge badge-webdl">WEB-DL</div>';
+        } else if (movie.sourceType === 'HDTC') {
+            badgeHtml = '<div class="source-badge badge-hdtc">HDTC</div>';
+        } else if (movie.sourceType === 'UPCOMING') {
+            badgeHtml = '<div class="source-badge badge-upcoming">UPCOMING</div>';
+        }
+        
+        return `
+            <div class="movie-card" onclick="openMovie(${movie.id})">
+                ${badgeHtml}
+                <img src="${movie.posterUrl}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'">
+                <h4>${movie.title} (${movie.year})</h4>
+                <div class="movie-card-fav ${isFavorite(movie.id) ? 'active' : ''}" onclick="toggleFavorite(event, ${movie.id})">
+                    <i class="fas fa-star"></i>
+                    <span>Add to Favourite</span>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function displayMovies() {
@@ -241,17 +245,125 @@ function displayMovies() {
         return;
     }
     
-    grid.innerHTML = filtered.map(movie => `
-        <div class="movie-card" onclick="openMovie(${movie.id})">
-            <img src="${movie.posterUrl}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'">
-            ${getSourceTypeBadge(movie.sourceType)}
-            <h4>${movie.title} (${movie.year})</h4>
-            <div class="movie-card-fav ${isFavorite(movie.id) ? 'active' : ''}" onclick="toggleFavorite(event, ${movie.id})">
-                <i class="fas fa-star"></i>
-                <span>Add to Favourite</span>
+    grid.innerHTML = filtered.map(movie => {
+        let badgeHtml = '';
+        if (movie.sourceType === 'WEB-DL') {
+            badgeHtml = '<div class="source-badge badge-webdl">WEB-DL</div>';
+        } else if (movie.sourceType === 'HDTC') {
+            badgeHtml = '<div class="source-badge badge-hdtc">HDTC</div>';
+        } else if (movie.sourceType === 'UPCOMING') {
+            badgeHtml = '<div class="source-badge badge-upcoming">UPCOMING</div>';
+        }
+        
+        return `
+            <div class="movie-card" onclick="openMovie(${movie.id})">
+                ${badgeHtml}
+                <img src="${movie.posterUrl}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'">
+                <h4>${movie.title} (${movie.year})</h4>
+                <div class="movie-card-fav ${isFavorite(movie.id) ? 'active' : ''}" onclick="toggleFavorite(event, ${movie.id})">
+                    <i class="fas fa-star"></i>
+                    <span>Add to Favourite</span>
+                </div>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
+}
+
+function getTimerAndProgress(movie) {
+    let timerHtml = '';
+    let progressHtml = '';
+    
+    if (movie.sourceType === 'UPCOMING' && movie.releaseDate && movie.releaseDate !== '') {
+        timerHtml = `
+            <div class="premium-countdown-container" id="countdownContainer">
+                <div class="premium-countdown-header">
+                    <i class="fas fa-hourglass-half"></i>
+                    <span>RELEASES IN</span>
+                </div>
+                <div id="movieCountdown"></div>
+            </div>
+        `;
+    }
+    
+    if (movie.status === 'uploading') {
+        const progress = parseInt(movie.uploadProgress) || 0;
+        progressHtml = `
+            <div class="premium-progress-container">
+                <div class="premium-progress-header">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>UPLOADING</span>
+                </div>
+                <div class="premium-progress-bar">
+                    <div class="premium-progress-fill" style="width: ${progress}%;"></div>
+                </div>
+                <div class="premium-progress-percentage">${progress}%</div>
+                <div class="premium-progress-status">Processing your request...</div>
+            </div>
+        `;
+    }
+    
+    return timerHtml + progressHtml;
+}
+
+function startCountdown(releaseDate) {
+    if (timerInterval) clearInterval(timerInterval);
+    
+    const timerElement = document.getElementById('movieCountdown');
+    if (!timerElement) return;
+    
+    function updateTimer() {
+        let release = new Date(releaseDate);
+        
+        if (isNaN(release.getTime())) {
+            release = new Date(releaseDate.replace(/-/g, '/'));
+        }
+        
+        if (isNaN(release.getTime())) {
+            timerElement.innerHTML = '<div class="countdown-released">📅 Coming Soon</div>';
+            return;
+        }
+        
+        const now = new Date();
+        const timeLeft = release - now;
+        
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            timerElement.innerHTML = '<div class="countdown-released"><i class="fas fa-ticket-alt"></i> NOW AVAILABLE!</div>';
+            return;
+        }
+        
+        const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((timeLeft % (86400000)) / (3600000));
+        const minutes = Math.floor((timeLeft % 3600000) / 60000);
+        const seconds = Math.floor((timeLeft % 60000) / 1000);
+        
+        timerElement.innerHTML = `
+            <div class="ultra-countdown">
+                <div class="ultra-countdown-item">
+                    <div class="ultra-countdown-number">${String(days).padStart(2, '0')}</div>
+                    <div class="ultra-countdown-label">DAYS</div>
+                </div>
+                <div class="ultra-countdown-separator">:</div>
+                <div class="ultra-countdown-item">
+                    <div class="ultra-countdown-number">${String(hours).padStart(2, '0')}</div>
+                    <div class="ultra-countdown-label">HOURS</div>
+                </div>
+                <div class="ultra-countdown-separator">:</div>
+                <div class="ultra-countdown-item">
+                    <div class="ultra-countdown-number">${String(minutes).padStart(2, '0')}</div>
+                    <div class="ultra-countdown-label">MINS</div>
+                </div>
+                <div class="ultra-countdown-separator">:</div>
+                <div class="ultra-countdown-item">
+                    <div class="ultra-countdown-number">${String(seconds).padStart(2, '0')}</div>
+                    <div class="ultra-countdown-label">SECS</div>
+                </div>
+            </div>
+        `;
+    }
+    
+    updateTimer();
+    timerInterval = setInterval(updateTimer, 1000);
 }
 
 function toggleFavorite(event, movieId) {
@@ -330,7 +442,7 @@ function setupEventListeners() {
     if (adminBtn) adminBtn.onclick = () => window.location.href = 'admin.html';
     
     const backBtn = document.getElementById('backBtn');
-    if (backBtn) backBtn.onclick = () => window.location.href = 'index.html';
+    if (backBtn) backBtn.onclick = () => window.history.back();
 }
 
 function loginUser() {
@@ -400,7 +512,6 @@ function downloadQuality(url) {
 }
 
 function openTelegram() {
-    // CHANGE THIS LINK TO YOUR TELEGRAM CHANNEL LINK
     const telegramLink = 'https://t.me/yourCineSpot';
     window.open(telegramLink, '_blank');
 }
@@ -409,14 +520,74 @@ function showLoading(show) {
     const loader = document.getElementById('loadingIndicator');
     if (loader) loader.style.display = show ? 'block' : 'none';
 }
+
 // Movie detail page handler
 if (window.location.pathname.includes('movie.html')) {
     const movieData = localStorage.getItem('selectedMovie');
     if (movieData) {
         const movie = JSON.parse(movieData);
+        console.log("Movie sourceType:", movie.sourceType);
+        console.log("Movie releaseDate:", movie.releaseDate);
+        console.log("Movie status:", movie.status);
+        
         const container = document.getElementById('movieDetailContainer');
         if (container) {
             const isFav = favorites.includes(movie.id);
+            const timerProgressHtml = getTimerAndProgress(movie);
+            
+            // Check if movie is ready for download
+            const isReady = movie.status === 'Ready' || movie.status === 'available' || (movie.sourceType !== 'UPCOMING' && movie.status !== 'uploading');
+            const isUploading = movie.status === 'uploading';
+            
+            // Watch Trailer button - ALWAYS ENABLED
+            let trailerButtonHtml = `
+                <button class="trailer-btn" onclick="openTrailer('${movie.trailerUrl || ''}')">
+                    <i class="fas fa-play"></i> Watch Trailer
+                </button>
+            `;
+            
+            // Download buttons - disabled if uploading or not ready
+            let downloadButtonsHtml = '';
+            if (isReady && !isUploading) {
+                downloadButtonsHtml = `
+                    <div class="download-section">
+                        <div class="download-title">
+                            <i class="fas fa-download"></i> DOWNLOAD
+                        </div>
+                        <div class="quality-buttons">
+                            <button class="quality-btn" onclick="downloadQuality('${movie.downloadUrl480 || ''}')">480p</button>
+                            <button class="quality-btn" onclick="downloadQuality('${movie.downloadUrl720 || ''}')">720p</button>
+                            <button class="quality-btn" onclick="downloadQuality('${movie.downloadUrl1080 || ''}')">1080p</button>
+                        </div>
+                    </div>
+                `;
+            } else if (isUploading) {
+                downloadButtonsHtml = `
+                    <div class="download-section">
+                        <div class="download-title">
+                            <i class="fas fa-download"></i> DOWNLOAD
+                        </div>
+                        <div class="quality-buttons">
+                            <button class="quality-btn disabled" disabled style="opacity: 0.5; cursor: not-allowed;">480p (Uploading)</button>
+                            <button class="quality-btn disabled" disabled style="opacity: 0.5; cursor: not-allowed;">720p (Uploading)</button>
+                            <button class="quality-btn disabled" disabled style="opacity: 0.5; cursor: not-allowed;">1080p (Uploading)</button>
+                        </div>
+                    </div>
+                `;
+            } else if (movie.sourceType === 'UPCOMING') {
+                downloadButtonsHtml = `
+                    <div class="download-section">
+                        <div class="download-title">
+                            <i class="fas fa-download"></i> DOWNLOAD
+                        </div>
+                        <div class="quality-buttons">
+                            <button class="quality-btn disabled" disabled style="opacity: 0.5; cursor: not-allowed;">480p (Coming Soon)</button>
+                            <button class="quality-btn disabled" disabled style="opacity: 0.5; cursor: not-allowed;">720p (Coming Soon)</button>
+                            <button class="quality-btn disabled" disabled style="opacity: 0.5; cursor: not-allowed;">1080p (Coming Soon)</button>
+                        </div>
+                    </div>
+                `;
+            }
             
             container.innerHTML = `
                 <div class="movie-detail-card">
@@ -425,9 +596,7 @@ if (window.location.pathname.includes('movie.html')) {
                         <h2>${movie.title} (${movie.year})</h2>
                         
                         <div class="movie-buttons">
-                            <button class="trailer-btn" onclick="openTrailer('${movie.trailerUrl || ''}')">
-                                <i class="fas fa-play"></i> Watch Trailer
-                            </button>
+                            ${trailerButtonHtml}
                             <button class="favourite-btn ${isFav ? 'active' : ''}" onclick="toggleFavouriteFromDetail(${movie.id})">
                                 <i class="fas fa-star"></i> Add to Favourite
                             </button>
@@ -441,23 +610,18 @@ if (window.location.pathname.includes('movie.html')) {
                         
                         <div class="download-divider"></div>
                         
-                        <div class="download-section">
-                            <div class="download-title">
-                                <i class="fas fa-download"></i> DOWNLOAD
-                            </div>
-                            <div class="quality-buttons">
-                                <button class="quality-btn" onclick="downloadQuality('${movie.downloadUrl480 || ''}')">480p</button>
-                                <button class="quality-btn" onclick="downloadQuality('${movie.downloadUrl720 || ''}')">720p</button>
-                                <button class="quality-btn" onclick="downloadQuality('${movie.downloadUrl1080 || ''}')">1080p</button>
+                        ${downloadButtonsHtml}
+                        
+                        <div class="note-section">
+                            <div class="note-title">📌 NOTE</div>
+                            <div class="note-content">
+                                Please Install OPERA, JIOSPHERE or BRAVE Browser And Enable AD-BLOCKER Inside the App For Smooth Downloading Process.<br>
+                                <br>
+                                Use VLC MEDIA PLAYER For Watching Movies/Series Without Any Interruption.
                             </div>
                         </div>
                         
-                        <!-- NOTE SECTION - EDIT YOUR TEXT HERE -->
-                        <div class="note-section">
-                            <div class="note-title">📌 NOTE:</div>
-                            <div class="note-content">
-                                Please Install Opera , JioSpehere , Brave Browser From Playstore and turn on ADS-BLOCKER Inside the app for smooth download process. The Download links were daily updated.                          </div>
-                        </div>
+                        ${timerProgressHtml}
                         
                         <div class="info-grid">
                             <div class="info-row">
@@ -488,35 +652,13 @@ if (window.location.pathname.includes('movie.html')) {
                     </div>
                 </div>
             `;
+            
+            // Start countdown if UPCOMING movie
+            if (movie.sourceType === 'UPCOMING' && movie.releaseDate && movie.releaseDate !== '') {
+                startCountdown(movie.releaseDate);
+            }
         }
     }
-}
-
-function toggleFavouriteFromDetail(movieId) {
-    if (!currentUser) {
-        alert('Please login first to save favorites!');
-        return;
-    }
-    
-    const index = favorites.indexOf(movieId);
-    if (index === -1) {
-        favorites.push(movieId);
-    } else {
-        favorites.splice(index, 1);
-    }
-    saveFavorites();
-    
-    const favBtn = document.querySelector('.favourite-btn');
-    if (favBtn) {
-        if (favorites.includes(movieId)) {
-            favBtn.classList.add('active');
-        } else {
-            favBtn.classList.remove('active');
-        }
-    }
-    
-    displayFavorites();
-    setupFeatured();
 }
 
 // ===== BOTTOM NAVIGATION FUNCTIONS =====
@@ -589,7 +731,7 @@ function setupFullSearch() {
         if (!resultsContainer) return;
         
         if (searchTerm.length === 0) {
-            resultsContainer.innerHTML = '<p style="text-align:center; grid-column:1/-1">🔍 Start typing to search movies...</p>';
+            resultsContainer.innerHTML = '<div class="no-results"><div class="no-results-text"><span class="no-results-icon">🎬</span><span class="no-results-title">Ready to Explore?</span><span class="no-results-message">Type a movie or series name...</span></div></div>';
             return;
         }
         
@@ -601,25 +743,51 @@ function setupFullSearch() {
         );
         
         if (filtered.length === 0) {
-            resultsContainer.innerHTML = '<p style="text-align:center; grid-column:1/-1">❌ No movies found for "' + searchTerm + '"</p>';
+            resultsContainer.innerHTML = `
+                <div class="no-results-container">
+                    <div class="no-results">
+                        <div class="no-results-text">
+                            <span class="no-results-icon">🎬</span>
+                            <span class="no-results-title">O-O! Sorry!</span>
+                            <span class="no-results-message">"${searchTerm}"<br> not available</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="no-results-btn" onclick="document.querySelector('.floating-support-btn').click()">
+                            🎧 Request Now
+                        </button>
+                    </div>
+                </div>
+            `;
             return;
         }
         
-        resultsContainer.innerHTML = filtered.map(movie => `
-            <div class="movie-card" onclick="openMovie(${movie.id})">
-                <img src="${movie.posterUrl}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'">
-                ${getSourceTypeBadge(movie.sourceType)}
-                <h4>${movie.title} (${movie.year})</h4>
-                <div class="movie-card-fav ${isFavorite(movie.id) ? 'active' : ''}" onclick="toggleFavorite(event, ${movie.id})">
-                    <i class="fas fa-star"></i>
-                    <span>Add to Favourite</span>
+        resultsContainer.innerHTML = filtered.map(movie => {
+            let badgeHtml = '';
+            if (movie.sourceType === 'WEB-DL') {
+                badgeHtml = '<div class="source-badge badge-webdl">WEB-DL</div>';
+            } else if (movie.sourceType === 'HDTC') {
+                badgeHtml = '<div class="source-badge badge-hdtc">HDTC</div>';
+            } else if (movie.sourceType === 'UPCOMING') {
+                badgeHtml = '<div class="source-badge badge-upcoming">UPCOMING</div>';
+            }
+            
+            return `
+                <div class="movie-card" onclick="openMovie(${movie.id})">
+                    ${badgeHtml}
+                    <img src="${movie.posterUrl}" alt="${movie.title}" onerror="this.src='https://via.placeholder.com/300x450?text=No+Poster'">
+                    <h4>${movie.title} (${movie.year})</h4>
+                    <div class="movie-card-fav ${isFavorite(movie.id) ? 'active' : ''}" onclick="toggleFavorite(event, ${movie.id})">
+                        <i class="fas fa-star"></i>
+                        <span>Add to Favourite</span>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     });
 }
 
 function setupCategoryView() {
     const categoryMoviesContainer = document.getElementById('categoryMovies');
     if (!categoryMoviesContainer) return;
-}
+            }
