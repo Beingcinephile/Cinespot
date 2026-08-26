@@ -3,28 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CINE SPOT</title>
+    <title>CINE SPOT - Movie Details</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 </head>
 <body>
     <header>
-        <button onclick="goBack()" class="back-btn"><i class="fas fa-arrow-left"></i> Back</button>
+        <button id="backBtn" class="back-btn"><i class="fas fa-arrow-left"></i> Back</button>
         <h1>🎬 CINE SPOT</h1>
         <div style="width: 50px;"></div>
     </header>
 
     <div id="movieDetailContainer" class="movie-detail-container"></div>
 
-    <script>
-        function goBack() {
-            window.location.href = 'index.html';
-        }
-    </script>
-    <!-- Floating Support Button -->
-<a href="https://t.me/yourCineSpot" target="_blank" class="floating-support-btn">
-    🎧
-</a>
+    <!-- Floating Request Button (Same position as home page) -->
+    <button class="floating-request-btn" onclick="openRequestPanelFromMovie()" title="Request Movie/Series">
+        📩
+        <span class="tooltip">Request Movie</span>
+    </button>
+
     <script src="config.js"></script>
     <script src="script.js"></script>
 </body>
