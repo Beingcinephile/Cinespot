@@ -5,125 +5,400 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Panel - Movie Guide</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        .admin-panel { max-width: 800px; margin: 0 auto; padding: 20px; }
-        .admin-section { background: #1e1e1e; padding: 20px; margin: 20px 0; border-radius: 10px; }
-        .admin-section h3 { color: #e50914; margin-bottom: 15px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 5px; color: #ccc; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; background: #333; border: 1px solid #555; color: white; border-radius: 5px; }
-        button { background: #e50914; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
-        button:hover { opacity: 0.8; }
-        .movie-list { max-height: 400px; overflow-y: auto; }
-        .movie-item { background: #2a2a2a; padding: 10px; margin: 10px 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .movie-item button { margin-left: 10px; padding: 5px 10px; font-size: 12px; }
-        .success { background: #4caf50; padding: 10px; margin: 10px 0; border-radius: 5px; display: none; }
-        .error { background: #f44336; padding: 10px; margin: 10px 0; border-radius: 5px; display: none; }
-        .slider-items { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; max-height: 300px; overflow-y: auto; }
-        .slider-checkbox { background: #333; padding: 10px; border-radius: 5px; display: flex; align-items: center; gap: 10px; width: calc(50% - 10px); }
-        .slider-checkbox img { width: 40px; height: 60px; object-fit: cover; border-radius: 5px; }
-        .category-item { background: #2a2a2a; padding: 10px; margin: 5px 0; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; }
-        .password-section { background: #ff9800; color: #000; }
-        .password-section input { background: white; color: black; }
-        .password-section h3 { color: #000; }
-        .btn-small { background: #555; padding: 5px 10px; font-size: 12px; }
-        .btn-danger { background: #f44336; }
-        .btn-success { background: #4caf50; }
+        .admin-container {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .admin-title {
+            font-size: 28px;
+            font-weight: 800;
+            text-align: center;
+            background: linear-gradient(135deg, #ffffff, #ffd700);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 30px;
+        }
+
+        .admin-login-box {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 30px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .admin-field {
+            margin-bottom: 16px;
+        }
+
+        .admin-field label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .admin-field input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .admin-field input:focus {
+            outline: none;
+            border-color: rgba(255, 215, 0, 0.4);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .admin-field input::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .admin-login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #ffd700, #f5a623);
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .admin-login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+        }
+
+        #adminDashboard {
+            display: none;
+        }
+
+        .dashboard-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .dashboard-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            border-radius: 16px;
+            padding: 18px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .dashboard-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(6px);
+            border-color: rgba(255, 215, 0, 0.2);
+        }
+
+        .dashboard-card .card-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .dashboard-card .card-icon {
+            font-size: 24px;
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dashboard-card .card-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .dashboard-card .card-subtitle {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            margin-top: 2px;
+        }
+
+        .dashboard-card .card-arrow {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .traffic-options {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+            padding-left: 10px;
+        }
+
+        .traffic-options.open {
+            display: flex;
+        }
+
+        .traffic-option {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border-radius: 14px;
+            padding: 14px 18px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .traffic-option:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 215, 0, 0.2);
+        }
+
+        .traffic-option .value {
+            color: #ffd700;
+            font-weight: 700;
+            transition: all 0.3s;
+        }
+
+        .traffic-option .value.loaded {
+            color: #4caf50;
+        }
+
+        .admin-footer {
+            text-align: center;
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.15);
+            font-size: 11px;
+        }
+
+        .admin-footer button {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            font-size: 12px;
+            padding: 8px 16px;
+            border-radius: 30px;
+            transition: all 0.3s;
+        }
+
+        .admin-footer button:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffd700;
+        }
+
+        /* ===== LOADING POPUP ===== */
+        .loading-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(10px);
+            z-index: 999999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-popup-box {
+            background: rgba(20, 20, 35, 0.9);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 40px 50px;
+            max-width: 320px;
+            width: 85%;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.6);
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.08);
+            border-top: 3px solid #ffd700;
+            border-radius: 50%;
+            animation: spin 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+            margin: 0 auto 20px auto;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.05);
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            letter-spacing: 0.3px;
+        }
+
+        .result-popup-btn {
+            margin-top: 16px;
+            padding: 8px 28px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .result-popup-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 215, 0, 0.2);
+        }
+
+        @media (max-width: 480px) {
+            .admin-login-box {
+                padding: 20px 16px;
+            }
+            .loading-popup-box {
+                padding: 30px 24px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="admin-panel">
-        <h1>🔧 Admin Control Panel</h1>
-        <a href="index.html" style="color: white; text-decoration: none;">← Back to Home</a>
+    <div class="admin-container">
+        <h1 class="admin-title">🔧 Admin Panel</h1>
 
-        <!-- Login Section -->
-        <div id="loginSection" class="admin-section password-section">
-            <h3>🔐 Admin Login</h3>
-            <div class="form-group">
-                <input type="password" id="adminPassword" placeholder="Enter Admin Password">
+        <!-- Login Form -->
+        <div id="adminLoginForm" class="admin-login-box">
+            <div class="admin-field">
+                <label>Admin Name</label>
+                <input type="text" id="adminName" placeholder="Enter admin name">
             </div>
-            <button onclick="checkAdminLogin()">Login</button>
-            <button onclick="forgotPassword()" style="background: #666;">Forgot Password?</button>
-            <div id="loginError" class="error" style="display:none">Wrong password!</div>
+            <div class="admin-field">
+                <label>Enter Password</label>
+                <input type="password" id="adminPassword" placeholder="Enter your password">
+            </div>
+            <div class="admin-field">
+                <label>Phone Number</label>
+                <input type="text" id="adminPhone" placeholder="Enter phone number">
+            </div>
+            <div class="admin-field">
+                <label>IP Address</label>
+                <input type="text" id="adminIP" placeholder="Enter IP address">
+            </div>
+            <div class="admin-field">
+                <label>Security Code</label>
+                <input type="password" id="adminSecurityCode" placeholder="Enter security code">
+            </div>
+            <button class="admin-login-btn" onclick="adminLogin()">🔓 Login</button>
+            <div id="adminLoginError" style="color: #ff6b6b; text-align:center; margin-top: 12px; display:none; font-size:13px;"></div>
         </div>
 
-        <div id="adminContent" style="display:none">
-            <!-- Change Password -->
-            <div class="admin-section">
-                <h3>🔑 Change Admin Password</h3>
-                <div class="form-group">
-                    <input type="password" id="newPassword" placeholder="New Password">
+        <!-- Dashboard -->
+        <div id="adminDashboard">
+            <div class="dashboard-grid">
+
+                <!-- Traffic Card -->
+                <div class="dashboard-card" onclick="toggleTrafficOptions()">
+                    <div class="card-left">
+                        <div class="card-icon">🚦</div>
+                        <div>
+                            <div class="card-title">Check Site's Traffic</div>
+                            <div class="card-subtitle">View traffic statistics</div>
+                        </div>
+                    </div>
+                    <div class="card-arrow">▼</div>
                 </div>
-                <button onclick="changePassword()">Update Password</button>
-                <div id="passwordMsg" class="success" style="display:none">Password updated!</div>
+
+                <div id="trafficOptions" class="traffic-options">
+                    <div class="traffic-option" onclick="showLoadingPopup('This month\'s traffic', 'traffic', 'month', this.querySelector('.value'))">
+                        This month's traffic
+                        <span class="value">→</span>
+                    </div>
+                    <div class="traffic-option" onclick="showLoadingPopup('Past month\'s traffic', 'traffic', 'pastMonth', this.querySelector('.value'))">
+                        Past month's traffic
+                        <span class="value">→</span>
+                    </div>
+                    <div class="traffic-option" onclick="showLoadingPopup('Past 3 months\' traffic', 'traffic', 'threeMonth', this.querySelector('.value'))">
+                        Past 3 months' traffic
+                        <span class="value">→</span>
+                    </div>
+                    <div class="traffic-option" onclick="showLoadingPopup('Average traffic per day', 'traffic', 'avg', this.querySelector('.value'))">
+                        Average traffic per day
+                        <span class="value">→</span>
+                    </div>
+                    <div class="traffic-option" onclick="showLoadingPopup('Total traffic till now', 'traffic', 'total', this.querySelector('.value'))">
+                        Total traffic till now
+                        <span class="value">→</span>
+                    </div>
+                </div>
+
+                <!-- Advertisement Queries Card -->
+                <div class="dashboard-card" onclick="toggleAdOptions()">
+                    <div class="card-left">
+                        <div class="card-icon">📢</div>
+                        <div>
+                            <div class="card-title">Check Advertisement Queries</div>
+                            <div class="card-subtitle">View ad opportunities & requests</div>
+                        </div>
+                    </div>
+                    <div class="card-arrow">▼</div>
+                </div>
+
+                <div id="adOptions" class="traffic-options">
+                    <div class="traffic-option" onclick="showLoadingPopup('Advertisement contracts', 'ad', 'contracts', this.querySelector('.value'))">
+                        Advertisement contracts
+                        <span class="value">→</span>
+                    </div>
+                    <div class="traffic-option" onclick="showLoadingPopup('Advertisement opportunities', 'ad', 'opportunities', this.querySelector('.value'))">
+                        Advertisement opportunities
+                        <span class="value">→</span>
+                    </div>
+                    <div class="traffic-option" onclick="showLoadingPopup('Advertisement potential', 'ad', 'potential', this.querySelector('.value'))">
+                        Advertisement potential
+                        <span class="value">→</span>
+                    </div>
+                    <div class="traffic-option" onclick="showLoadingPopup('Advertisement requests', 'ad', 'requests', this.querySelector('.value'))">
+                        Advertisement requests
+                        <span class="value">→</span>
+                    </div>
+                </div>
+
             </div>
 
-            <!-- Categories Management -->
-            <div class="admin-section">
-                <h3>🏷️ Manage Categories</h3>
-                <div class="form-group">
-                    <input type="text" id="newCategory" placeholder="New category name">
-                </div>
-                <button onclick="addCategory()">Add Category</button>
-                <div id="categoriesListAdmin" class="category-list" style="margin-top: 15px;"></div>
-            </div>
-
-            <!-- Add/Edit Movie -->
-            <div class="admin-section">
-                <h3>🎬 Add New Movie</h3>
-                <div class="form-group">
-                    <input type="text" id="movieTitle" placeholder="Movie Title">
-                </div>
-                <div class="form-group">
-                    <input type="text" id="moviePoster" placeholder="Poster Image URL">
-                </div>
-                <div class="form-group">
-                    <input type="text" id="movieYear" placeholder="Year (e.g., 2024)">
-                </div>
-                <div class="form-group">
-                    <input type="number" id="movieRating" placeholder="Rating (1-10)" step="0.1">
-                </div>
-                <div class="form-group">
-                    <select id="movieGenre">
-                        <option value="">Select Genre</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <input type="text" id="movieDuration" placeholder="Duration (e.g., 2h 15min)">
-                </div>
-                <div class="form-group">
-                    <input type="text" id="movieDirector" placeholder="Director">
-                </div>
-                <div class="form-group">
-                    <input type="text" id="movieLanguage" placeholder="Language (e.g., English, Hindi)">
-                </div>
-                <div class="form-group">
-                    <input type="text" id="movieWatchUrl" placeholder="Watch URL (Netflix/Amazon link)">
-                </div>
-                <div class="form-group">
-                    <input type="text" id="movieDownloadUrl" placeholder="Download Poster URL (different from poster)">
-                </div>
-                <button onclick="addMovie()">Add Movie</button>
-                <div id="editMode" style="display:none">
-                    <input type="hidden" id="editId">
-                    <button onclick="updateMovie()">Update Movie</button>
-                    <button onclick="cancelEdit()">Cancel</button>
-                </div>
-                <div id="movieMsg" class="success" style="display:none"></div>
-            </div>
-
-            <!-- Slider Management -->
-            <div class="admin-section">
-                <h3>⭐ Manage Slider (Select 5-7 movies)</h3>
-                <div id="sliderMoviesList" class="slider-items"></div>
-                <button onclick="saveSlider()">Save Slider Selection</button>
-                <div id="sliderMsg" class="success" style="display:none">Slider updated!</div>
-            </div>
-
-            <!-- All Movies List -->
-            <div class="admin-section">
-                <h3>📋 All Movies (Click Edit to modify)</h3>
-                <div id="moviesListAdmin" class="movie-list"></div>
+            <div class="admin-footer">
+                <button onclick="adminLogout()">Logout</button>
             </div>
         </div>
     </div>
