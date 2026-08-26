@@ -6,7 +6,6 @@
     <title>CINE SPOT - Movie Guide</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
 </head>
 <body>
     <header>
@@ -14,19 +13,30 @@
         <button id="adminPanelBtn" class="admin-btn">🔧 Admin</button>
     </header>
 
-    <!-- User Login Section -->
+    <!-- ===== COMPACT GLASSY LOGIN PANEL ===== -->
     <div id="userSection" class="user-section">
         <div id="loggedOutView">
-            <h3>👤 Quick Login</h3>
+            <h3>Welcome, <span id="welcomeUsername">Guest</span></h3>
+            
             <div class="login-form">
-                <input type="text" id="dummyUsername" placeholder="Username (anything works)" autocomplete="off">
-                <input type="password" id="dummyPassword" placeholder="Password (anything works)">
-                <button id="loginBtn">Login / Sign Up</button>
+                <label>Enter Username</label>
+                <div class="input-group">
+                    <input type="text" id="dummyUsername" placeholder="Enter Username" autocomplete="off">
+                </div>
+                
+                <label>Enter Password</label>
+                <div class="input-group">
+                    <input type="password" id="dummyPassword" placeholder="Enter Password">
+                </div>
+                
+                <button id="loginBtn">✨ Sign In</button>
             </div>
-            <small>✨ No email needed - just type any username and password!</small>
         </div>
         <div id="loggedInView" style="display:none">
-            <p>Welcome, <span id="currentUser"></span>! <button id="logoutBtn" class="logout-btn">Logout</button></p>
+            <h3>Welcome, <span id="currentUser"></span>!</h3>
+            <div style="text-align:center; margin-top:10px;">
+                <button id="logoutBtn" class="logout-btn">🚪 Logout</button>
+            </div>
         </div>
     </div>
 
@@ -50,7 +60,6 @@
                 <h2>🎥 All Movies</h2>
             </div>
             <div id="movieGrid" class="movie-grid"></div>
-            <div id="loadingIndicator" class="loading">📽️ Loading movies...</div>
         </div>
     </div>
 
@@ -87,13 +96,15 @@
 
     <!-- FOOTER -->
     <div class="footer">
-        <p>MADE BY CINEPHILES FOR CINEPHILES
-        MADE WITH UNITY 🚀</p>
+        <p>MADE BY CINEPHILES FOR CINEPHILES</p>
     </div>
-<!-- Floating Support Button -->
-<a href="https://t.me/yourCineSpot" target="_blank" class="floating-support-btn" id="floatingSupportBtn">
-    🎧
-</a>
+
+    <!-- Floating Request Button -->
+    <button class="floating-request-btn" onclick="openRequestPanel('')" title="Request Movie/Series">
+        📩
+        <span class="tooltip">Request Movie</span>
+    </button>
+
     <!-- BOTTOM NAVIGATION BAR -->
     <div class="bottom-nav">
         <div class="nav-item active" data-page="home">
@@ -114,8 +125,25 @@
         </div>
     </div>
 
+    <!-- ===== PREMIUM LOADING SPINNER ===== -->
+    <div id="loadingIndicator" class="loading-overlay">
+        <div class="loading-container">
+            <div class="loading-spinner-premium">
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-ring"></div>
+                <div class="spinner-center">🎬</div>
+            </div>
+            <div class="loading-text-premium">Loading Movies</div>
+            <div class="loading-dots">
+                <span class="dot-pulse"></span>
+                <span class="dot-pulse"></span>
+                <span class="dot-pulse"></span>
+            </div>
+        </div>
+    </div>
+
     <script src="config.js"></script>
     <script src="script.js"></script>
-    
 </body>
 </html>
